@@ -47,9 +47,16 @@ Display.prototype.validate = function(book){
 // Implement the show function
 Display.prototype.show = function(type, displayMessage){
   let message = document.getElementById('message');
+  let boldText;
+    if (type==='success') {
+      boldText = 'Success';
+    }
+    else{
+      boldText = 'Error';
+    }
   message.innerHTML += `
       <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-        <strong>Message:</strong>${displayMessage}
+        <strong>${boldText}:</strong>${displayMessage}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>` ;
   setTimeout(function(){
