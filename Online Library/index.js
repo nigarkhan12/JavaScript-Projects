@@ -54,7 +54,7 @@ Display.prototype.show = function(type, displayMessage){
       </div>` ;
   setTimeout(function(){
     message.innerHTML = '';
-  }, 2000); 
+  }, 5000); 
 }
 
 

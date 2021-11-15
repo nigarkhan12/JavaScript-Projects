@@ -39,7 +39,7 @@ console.log('This is indexES6 file');
         </div>` ;
     setTimeout(function(){
       message.innerHTML = '';
-    }, 2000); 
+    }, 5000); 
   }
  }
 
