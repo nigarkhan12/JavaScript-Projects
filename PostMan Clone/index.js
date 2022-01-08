@@ -1,5 +1,9 @@
 console.log("This is my PostMan Clone Project");
-
+/**
+ * 1. Used Prism JS for highlighting the response
+ * 2.  Used https://randomuser.me/api to test GET request
+ * 3. Used https://jsonplaceholder.typicode.com/guide/ to test POST request
+ */
 
 // Utility functions:
 // 1. Utility function to get DOM element from String
