@@ -1,0 +1,35 @@
+body{
+  background: darkslateblue;
+}
+
+.imgBox{
+  background-image: url('smiley.jfif');
+  cursor: pointer;
+position: relative;
+top: 7px;
+left: 5px;
+height: 206px;
+width: 222px;
+}
+
+.whiteBox{
+  display: inline-block;
+  height: 236px;
+width: 242px;
+margin: 10px;
+border: 3px black solid;
+background-color: white;
+}
+
+.hold{
+  border: solid 4px red;
+}
+
+.hide{
+  display: none;
+}
+
+.dashed{
+  background: lightgray;
+  border-style: dashed;
+}
