@@ -3,6 +3,8 @@
 class Workout {
   date = new Date();
   id = (Date.now() + '').slice(-10);
+  clicks = 0;
+
   constructor(coords, distance, duration) {
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in KMs
@@ -15,6 +17,9 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()} ${this.type.slice(
       1
     )} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+  }
+  click() {
+    this.clicks++;
   }
 }
 
@@ -69,11 +74,14 @@ const inputElevation = document.querySelector('.form__input--elevation');
 class App {
   #map;
   #mapEvent;
+  #mapZoomLevel = 13;
   #workouts = [];
+
   constructor() {
     this._getPosition();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -90,7 +98,7 @@ class App {
     const { longitude } = position.coords;
     console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
     const coords = [latitude, longitude];
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.mapZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -189,7 +197,9 @@ class App {
           className: `${workout.type}-popup`,
         })
       )
-      .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'}`)
+      .setPopupContent(
+        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
+      )
       .openPopup();
   }
 
@@ -212,7 +222,6 @@ class App {
     </div>`;
 
     if (workout.type === 'running') {
-      console.log('Inside running');
       html += `<div class="workout__details">
       <span class="workout__icon">⚡️</span>
       <span class="workout__value">${workout.pace.toFixed(1)}</span>
@@ -223,10 +232,10 @@ class App {
       <span class="workout__value">${workout.cadence}</span>
       <span class="workout__unit">spm</span>
     </div>`;
+    }
 
-      if (workout.type === 'cycling') {
-        console.log('Inside cycling');
-        html += `<div class="workout__details">
+    if (workout.type === 'cycling') {
+      html += `<div class="workout__details">
         <span class="workout__icon">⚡️</span>
         <span class="workout__value">${workout.speed.toFixed(1)}</span>
         <span class="workout__unit">km/h</span>
@@ -236,9 +245,27 @@ class App {
         <span class="workout__value">${workout.elevationGain}</span>
         <span class="workout__unit">m</span>
       </div>`;
-        form.insertAdjacentHTML('afterend', html);
-      }
     }
+    form.insertAdjacentHTML('afterend', html);
+  }
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+
+    if (!workoutEl) return;
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+    console.log(workout);
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+
+    // using the public interface
+    work.click();
   }
 }
 
