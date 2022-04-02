@@ -534,10 +534,13 @@ const controlRecipes = async function() {
         const id = window.location.hash.slice(1);
         if (!id) return;
         _recipeViewJsDefault.default.renderSpinner();
+        //  0) Update results view to mark selected search result
+        _resultsViewJsDefault.default.update(_modelJs.getSearchResultsPage());
         //  1) Loading recipe
         await _modelJs.loadRecipe(id);
         // 2) Rendering recipe
-        _recipeViewJsDefault.default.render(_modelJs.state.recipe);
+        _recipeViewJsDefault.default.update(_modelJs.state.recipe);
+    // recipeView.render(model.state.recipe);
     // const recipeView = new recipeView(model.state.recipe); same as above
     } catch (err) {
         _recipeViewJsDefault.default.renderError();
@@ -553,7 +556,7 @@ const controlSearchResults = async function() {
         await _modelJs.loadSearchResults(query);
         // 3) Render results
         // resultsView.render(model.state.search.results);
-        _resultsViewJsDefault.default.render(_modelJs.getSearchResultsPage(3));
+        _resultsViewJsDefault.default.render(_modelJs.getSearchResultsPage());
         // 4) Render initial pagination buttons
         _paginationViewJsDefault.default.render(_modelJs.state.search);
     } catch (error) {
@@ -2467,6 +2470,29 @@ class View {
         this._clear();
         this._parentElement.insertAdjacentHTML('afterbegin', markup);
     }
+    update(data) {
+        this._data = data; // Once we update the data then we want the new's data to become new data
+        // This will basically a newMarkup as if we wanted to render a new View
+        // but again here we are going to update the Markup
+        // here we are just createing newMarkup instead of rendering it
+        //  generate this markup & compare this HTML to new HTML
+        const newMarkup = this._generateMarkup(); // We also want to generate some new Markup(It will return in String)
+        // Converts the Markup string to a DOM object that's living in the memory
+        // & then we can use it to compare with the actual DOM that's
+        // on the page
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = Array.from(newDOM.querySelectorAll('*'));
+        const curElements = Array.from(this._parentElement.querySelectorAll('*'));
+        newElements.forEach((newEl, i)=>{
+            const curEl = curElements[i];
+            console.log(curEl, newEl.isEqualNode(curEl));
+            // Updates changed TEXT
+            if (!newEl.isEqualNode(curEl) && newEl.firstChild?.nodeValue.trim() !== '') curEl.textContent = newEl.textContent;
+            // Updates changed Attributs
+            if (!newEl.isEqualNode(curEl)) Array.from(newEl.attributes).forEach((attr)=>curEl.setAttribute(attr.name, attr.value)
+            );
+        });
+    }
     _clear() {
         this._parentElement.innerHTML = '';
     }
@@ -2837,9 +2863,10 @@ class ResultsView extends _viewJsDefault.default {
         return this._data.map(this._generateMarkupPreview).join('');
     }
     _generateMarkupPreview(result) {
+        const id = window.location.hash.slice(1);
         return `
     <li class="preview">
-    <a class="preview__link" href="#${result.id}">
+    <a class="preview__link" ${result.id === id ? 'preview__link--active' : ''} href="#${result.id}">
       <figure class="preview__fig">
         <img src="${result.image}" alt="${result.title}" />
       </figure>
