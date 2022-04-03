@@ -88,8 +88,35 @@ const controlBookmarks = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
-const controlAddRecipe = function (newRecipe) {
-  //  Upload the new recipe data
+const controlAddRecipe = async function (newRecipe) {
+  try {
+    // Show loading spinner
+    addRecipeView.renderSpinner();
+
+    //  Upload the new recipe data
+    await model.uploadRecipe(newRecipe);
+
+    // Render recipe
+    recipeView.render(model.state.recipe);
+
+    //  Success message
+    addRecipeView.renderMessage();
+
+    // Render bookmark view
+    bookmarksView.render(model.state.bookmarks);
+
+    // Change ID in the URl
+    window.history.pushState(null, '', `#${model.state.recipe.id}`); // allow to change state without reloading the URL
+    // window.history.back(); // automatically gong back to last page
+
+    //  Close Form Window
+    setTimeout(function () {
+      addRecipeView.toggleWindow();
+    }, MODAL_CLOSE_SEC * 1000);
+  } catch (error) {
+    console.error('🔥', error);
+    addRecipeView.renderError(error.message);
+  }
 };
 
 const init = function () {
